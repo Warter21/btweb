@@ -87,19 +87,7 @@ Frontend (HTML + JS)
 
 ## 📡 API Endpoints
 
-Endpoint	Method	Description	Parameters	Example Response
-/api/devices	GET	Returns all Bluetooth devices with status, A2DP, battery, RSSI, volume, and type information.	–	json\n[{\n "mac": "83:F0:5D:7E:87:E0",\n "name": "OontZ Angle",\n "connected": true,\n "paired": true,\n "trusted": true,\n "rssi": -62,\n "a2dp": true,\n "device_type": "headset",\n "volume": 100,\n "battery": 70\n}]\n
-/api/scan	POST	Starts a 20‑second Bluetooth scan.	–	json\n{"status": "scan started"}\n
-/api/restart/squeezelite	POST	Restarts the Squeezelite service.	–	json\n{"status": "ok"}\n
-/api/restart/pulseaudio	POST	Restarts PulseAudio.	–	json\n{"status": "ok"}\n
-/api/connect/<mac>	POST	Connects to a Bluetooth device.	mac – device MAC address	json\n{"status": "connected"}\n
-/api/disconnect/<mac>	POST	Disconnects a Bluetooth device.	mac – device MAC address	json\n{"status": "disconnected"}\n
-/api/volume/<mac>/<value>	POST	Sets device volume (0–100).	mac, value	json\n{"status": "ok"}\n
-/api/debug/battery/<mac>	GET	Returns the battery level directly from PulseAudio for debugging.	mac	json\n{"mac": "83:F0:5D:7E:87:E0", "battery": 70}\n
-/api/debug/pactl	GET	Returns the full output of pactl list cards for debugging.	–	json\n{"output": "..."}\n
-
 <img width="930" height="802" alt="image" src="https://github.com/user-attachments/assets/dddc5267-b350-419f-92dd-c1f8b72cab9f" />
-
 
 ---
 
