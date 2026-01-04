@@ -1,1 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Bluetooth Manager</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 40px;
+            background: #f5f5f5;
+            color: #222;
+            transition: background 0.2s, color 0.2s;
+        }
+        body.dark {
+            background: #303030;
+            color: #e0e0e0;
+        }
+        .device { margin-bottom: 15px; padding: 8px 0; border-bottom: 1px solid #ccc; }
+        body.dark .device { border-color: #444; }
+        .connected { color: #00aa00; font-weight: bold; }
+        .disconnected { color: #cc3333; }
+        a.button {
+            padding: 4px 8px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 0 4px 4px 0;
+            font-size: 0.9rem;
+        }
+        a.disconnect { background: #dc3545; }
+        a.secondary {
+            background: #6c757d;
+        }
+        #scan-indicator {
+            margin: 10px 0;
+            font-weight: bold;
+            color: #ff8800;
+        }
+        body.dark #scan-indicator {
+            color: #ffc107;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 6px;
+            background: #eee;
+            color: #333;
+        }
+        body.dark .badge {
+            background: #333;
+            color: #ddd;
+        }
+        .volume-slider {
+            width: 150px;
+            vertical-align: middle;
+        }
+        .small {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        body.dark .small {
+            color: #aaa;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dark-toggle {
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #888;
+            font-size: 0.9rem;
+        }
+        .button-row {
+            display: flex;
+            align-items: center;
+        }
+        .separator { 
+            margin: 0 12px; 
+            width: 1px; 
+            height: 32px;
+            background: #888; 
+            margin: 0 12px;
+        } 
+        body.dark .separator { 
+            background: #aaa;
+        }
+    </style>
+</head>
+<body>
 
+<div class="top-bar">
+    <h1>Bluetooth Manager</h1>
+    <button id="darkToggle" class="dark-toggle">🌙 Dark mode</button>
+</div>
+
+
+<div class="button-row"> 
+<a class="button" href="/scan/on">Bluetooth Scan (20s)</a> 
+<div class="separator"></div>
+<a class="button" href="/restart/squeezelite">Restart Squeezelite</a> 
+<a class="button" href="/restart/pulseaudio">Restart PulseAudio</a> 
+</div>
+<div id="scan-indicator"></div>
+
+<hr>
+
+<h3>Bluetooth Devices</h3>
+<div id="device-list">Loading...</div>
+
+<script>
+// Dark mode
+function applyDarkModeSetting() {
+    const enabled = localStorage.getItem("btweb_dark") === "1";
+    document.body.classList.toggle("dark", enabled);
+    document.getElementById("darkToggle").innerText = enabled
+        ? "☀️ Light mode"
+        : "🌙 Dark mode";
+}
+document.getElementById("darkToggle").addEventListener("click", () => {
+    const enabled = !(localStorage.getItem("btweb_dark") === "1");
+    localStorage.setItem("btweb_dark", enabled ? "1" : "0");
+    applyDarkModeSetting();
+});
+applyDarkModeSetting();
+
+// Icon
+function iconForType(type, connected) {
+    if (type === "speaker") return connected ? "🔊" : "🔈";
+    if (type === "headset") return "🎧";
+    if (type === "phone") return "📱";
+    return connected ? "🔊" : "📡";
+}
+
+async function refreshDevices() {
+    const res = await fetch("/api/devices");
+    const devices = await res.json();
+
+    let html = "";
+    for (const d of devices) {
+        const icon = iconForType(d.device_type, d.connected);
+        const status = d.connected
+            ? `<span class="connected">Connected</span>`
+            : `<span class="disconnected">Disconnected</span>`;
+
+        const battery = (typeof d.battery === "number")
+            ? `<span class="small">🔋 ${d.battery}%</span>`
+            : "";
+
+        const rssiText = (d.rssi !== null && d.rssi !== undefined)
+            ? `<span class="small">RSSI: ${d.rssi} dBm</span>`
+            : "";
+
+        const a2dpBadge = d.a2dp ? `<span class="badge">A2DP</span>` : "";
+
+        const pairBtn = d.paired
+            ? `<a class="button secondary" href="/remove/${d.mac}">Remove</a>`
+            : `<a class="button secondary" href="/pair/${d.mac}">Pair</a>`;
+
+        const trustBtn = d.trusted
+            ? `<a class="button secondary" href="/untrust/${d.mac}">Untrust</a>`
+            : `<a class="button secondary" href="/trust/${d.mac}">Trust</a>`;
+
+        const connBtn = d.connected
+            ? `<a class="button disconnect" href="/disconnect/${d.mac}">Disconnect</a>`
+            : `<a class="button" href="/connect/${d.mac}">Connect</a>`;
+
+        let volumeHtml = "";
+        if (d.connected && d.volume !== null && d.volume !== undefined) {
+            volumeHtml = `
+                <div class="small">
+                    Volume:
+                    <input type="range" class="volume-slider"
+                           min="0" max="100" value="${d.volume}"
+                           oninput="setVolume('${d.mac}', this.value)">
+                    <span id="vol-${d.mac}">${d.volume}%</span>
+                </div>
+            `;
+        }
+
+        html += `
+            <div class="device">
+                ${icon} <strong>${d.name}</strong> (${d.mac})
+                ${a2dpBadge} ${battery} ${rssiText}<br>
+                ${status} ${connBtn} ${pairBtn} ${trustBtn}<br>
+                ${volumeHtml}
+            </div>
+        `;
+    }
+
+    document.getElementById("device-list").innerHTML = html;
+}
+
+async function refreshScanStatus() {
+    const res = await fetch("/api/scan_status");
+    const data = await res.json();
+
+    if (data.scanning) {
+        document.getElementById("scan-indicator").innerHTML = "🔍 Scanning...";
+    } else {
+        document.getElementById("scan-indicator").innerHTML = "";
+    }
+}
+
+async function setVolume(mac, vol) {
+    document.getElementById(`vol-${mac}`).innerText = `${vol}%`;
+    await fetch(`/api/set_volume/${mac}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ volume: vol })
+    });
+}
+
+// refresh
+setInterval(refreshDevices, 5000);
+setInterval(refreshScanStatus, 1000);
+
+// first load
+refreshDevices();
+refreshScanStatus();
+</script>
+
+</body>
+</html>
