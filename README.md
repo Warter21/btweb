@@ -89,8 +89,3 @@ Frontend (HTML + JS)
 
 <img width="930" height="802" alt="image" src="https://github.com/user-attachments/assets/dddc5267-b350-419f-92dd-c1f8b72cab9f" />
 
----
-
-## 📝 License
-
-MIT License (or whichever you prefer)
