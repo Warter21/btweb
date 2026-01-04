@@ -97,6 +97,6 @@ Frontend (HTML + JS)
 | `/api/disconnect/<mac>`       | `POST`     | Disconnects a Bluetooth device.                                             | `mac` – device MAC address  | `{"status": "disconnected"}`                                                        |
 | `/api/volume/<mac>/<value>`   | `POST`     | Sets device volume (0–100).                                                 | `mac`, `value`              | `{"status": "ok"}`                                                                  |
 | `/api/debug/battery/<mac>`    | `GET`      | Returns the battery level directly from PulseAudio for debugging.           | `mac`                       | `{"mac": "83:F0:5D:7E:87:E0", "battery": 70}`                                       |
-| `/api/debug/pactl`            | `GET`      | Returns the full output of `pactl list cards` for debugging.                | –                           | `{"output": "..."}`                                                                 |
+                                                               |
 
 
