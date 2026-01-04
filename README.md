@@ -5,6 +5,8 @@ This project provides a clean web dashboard with real‑time updates, device con
 
 Designed for headless systems such as embedded Linux boards, home servers, media players, and DIY audio setups.
 
+<img width="1235" height="414" alt="Screenshot 2026-01-04 122357" src="https://github.com/user-attachments/assets/bfc611b0-746b-4976-9ea0-4989e110af5d" />
+
 ---
 
 ## ✨ Features
