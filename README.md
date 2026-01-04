@@ -56,7 +56,7 @@ Designed for headless systems such as embedded Linux boards, home servers, media
 1. Clone the repository.
 2. Install dependencies: sudo apt install python3 python3-flask pulseaudio-utils bluez
 3. Start the server: python3 btweb.py
-4. Then open your browser: http://<your-device-ip>:1234
+4. Then open your browser: http://serverip:1234
 
 ---
 
