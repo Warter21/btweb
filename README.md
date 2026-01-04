@@ -87,16 +87,16 @@ Frontend (HTML + JS)
 
 ## 📡 API Endpoints
 
-| **Endpoint**                    | **Method** | **Description**                                                             | **Parameters**              | **Example Response**                                                                 |
-|--------------------------------|------------|-----------------------------------------------------------------------------|-----------------------------|--------------------------------------------------------------------------------------|
-| `/api/devices`                 | `GET`      | Returns all Bluetooth devices with status, A2DP, battery, RSSI, volume, and type information. | –                           | `{"mac": "83:F0:5D:7E:87:E0", "name": "OontZ Angle", "connected": true, ...}`       |
-| `/api/scan`                    | `POST`     | Starts a 20-second Bluetooth scan.                                          | –                           | `{"status": "scan started"}`                                                        |
-| `/api/restart/squeezelite`    | `POST`     | Restarts the Squeezelite service.                                           | –                           | `{"status": "ok"}`                                                                  |
-| `/api/restart/pulseaudio`     | `POST`     | Restarts PulseAudio.                                                        | –                           | `{"status": "ok"}`                                                                  |
-| `/api/connect/<mac>`          | `POST`     | Connects to a Bluetooth device.                                             | `mac` – device MAC address  | `{"status": "connected"}`                                                           |
-| `/api/disconnect/<mac>`       | `POST`     | Disconnects a Bluetooth device.                                             | `mac` – device MAC address  | `{"status": "disconnected"}`                                                        |
-| `/api/volume/<mac>/<value>`   | `POST`     | Sets device volume (0–100).                                                 | `mac`, `value`              | `{"status": "ok"}`                                                                  |
-| `/api/debug/battery/<mac>`    | `GET`      | Returns the battery level directly from PulseAudio for debugging.           | `mac`                       | `{"mac": "83:F0:5D:7E:87:E0", "battery": 70}`                                       |
-                                                               |
-
-
+| **Endpoint**                     | **Method** | **Description**                                              |
+|----------------------------------|------------|--------------------------------------------------------------|
+| `/api/devices`                  | `GET`      | Returns full device list with status, RSSI, volume, etc.     |
+| `/api/scan_status`              | `GET`      | Returns whether scanning is active                           |
+| `/api/set_volume/`              | `POST`     | Sets volume for the device’s PulseAudio sink                 |
+| `/connect/`                     | `GET`      | Connects to a device                                         |
+| `/disconnect/`                  | `GET`      | Disconnects a device                                         |
+| `/pair/`                        | `GET`      | Pairs a device                                               |
+| `/remove/`                      | `GET`      | Removes pairing                                              |
+| `/trust/`                       | `GET`      | Trusts a device                                              |
+| `/untrust/`                     | `GET`      | Untrusts a device                                            |
+| `/scan/on`                      | `GET`      | Starts a 20‑second scan                                      |
+| `/api/debug/battery/<mac>`      | `GET`      | Returns battery level directly from PulseAudio for debugging |
